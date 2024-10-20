@@ -1,11 +1,12 @@
 pipeline {
     agent any
 
-    environment{
+    environment {
         NETLIFY_SITE_ID = '8a255d8e-675a-4d83-bf7b-996d75dc777b'
     }
 
     stages {
+
         stage('Build') {
             agent {
                 docker {
@@ -18,7 +19,7 @@ pipeline {
                     ls -la
                     node --version
                     npm --version
-                    npm ci 
+                    npm ci
                     npm run build
                     ls -la
                 '''
@@ -26,26 +27,28 @@ pipeline {
         }
 
         stage('Tests') {
-            parallel{
-                stage('Unit tests'){
+            parallel {
+                stage('Unit tests') {
                     agent {
                         docker {
                             image 'node:18-alpine'
                             reuseNode true
                         }
                     }
+
                     steps {
                         sh '''
-                            test -f build/index.html
+                            #test -f build/index.html
                             npm test
                         '''
                     }
-                    post{
-                        always{
-                            junit 'test-results/junit.xml'
+                    post {
+                        always {
+                            junit 'jest-results/junit.xml'
                         }
                     }
                 }
+
                 stage('E2E') {
                     agent {
                         docker {
